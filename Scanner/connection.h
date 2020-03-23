@@ -4,6 +4,6 @@
 #define _CONNECTION_H_
 
 
-void connection(char* ip);
+void connection();
 
 #endif
