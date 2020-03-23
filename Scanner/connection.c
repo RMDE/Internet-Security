@@ -1,9 +1,14 @@
 //function: using connect function of socket to scanner
 #include<stdio.h>
-//#include<sys/types.h>
-//#include<sys/socket.h>
-#include<winsock2.h>
+#include<stdlib.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<arpa/inet.h>
+#include<netinet/in.h>
+#include<unistd.h>
+//#include<winsock2.h>
 #include<string.h>
+#include "connection.h"
 
 void Int2str(int m,char str[]){
 	if(m<10)
@@ -27,7 +32,7 @@ void Int2str(int m,char str[]){
 }
 
 void connection(char* ip){
-	int sf = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+	int sf = socket(AF_INET,SOCK_STREAM,0);
 	FILE* fp;
 	fp=fopen("connection.txt","w");
 	if(sf < 0)
@@ -39,20 +44,25 @@ void connection(char* ip){
 	memset(&address,0,sizeof(address));
 	address.sin_family = AF_INET;
 	char tail[5];
-	for(int i=0;i<255;i++)
+	for(int i=1;i<255;i++)
 	{
 		Int2str(i,tail);
 		strcat(ip,tail);
 		fprintf(fp,"%s:\n",ip);
+        printf("%s:\n",ip);
 		for(int j=1;j<1024;j++)
 		{
 			address.sin_port = htons(j);
 			address.sin_addr.s_addr=inet_addr(ip);
 			//bzero(&(address.sin_zero),8);
-			if(connect(sf,(struct sockaddr*)&address,sizeof(address))>0)
+            int res=connect(sf,(struct sockaddr*)&address,sizeof(address));
+            printf("%d ",res);
+			if(res>0)
 			{
 				fprintf(fp,"	%d\n",j);
+                printf("    %d\n",j);
 			}
 		}
 	}
+    fclose(fp);
 }

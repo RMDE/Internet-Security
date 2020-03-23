@@ -4,7 +4,7 @@
 #include "connection.h"
 int main()
 {
-	char ip[]="192.168.56.";
+	char ip[]="192.168.78.";
 	clock_t start,finish;
 	double duration;
 	printf("*****************The first method: TCP-connect********************\n");
