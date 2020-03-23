@@ -2,6 +2,7 @@
 #include<time.h>
 #include<stdio.h>
 #include "connection.h"
+#include "global.h"
 int main()
 {
 	char ip[]="192.168.78.";

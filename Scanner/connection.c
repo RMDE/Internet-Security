@@ -1,5 +1,6 @@
 //function: using connect function of socket to scanner
 #include <sys/socket.h>
+#include <stdbool.h>
 #include <netinet/in.h>
 #include <errno.h>
 #include <netdb.h>
@@ -43,7 +44,7 @@ void GetIp(){
 	//get host's name and ip
 	hostname = fopen("./.hname","r");
 	hostip = fopen("./.hip","r");
-	while(fgats(name,40,hostname)&&fgets(ip,40,hostip))
+	while(fgets(name,40,hostname)&&fgets(ip,40,hostip))
 	{
 		if(name[strlen(name)-1] == '\n')
 			name[strlen(name)-1] = '\0';
@@ -57,12 +58,12 @@ void GetIp(){
 	fclose(hostname);
 	fclose(hostip);
 	//output the infomation of hosts in Lan
-	printf("All hosts in LAN:\n");
-	printf("No\tName\t\tIP\n");
-	for(int i=0;i<hostsNum;i++)
-	{
-		printf("%s\t%s\t\t%s\n",i+1,hosts[i].name,hosts[i].ip);
-	}
+	//printf("All hosts in LAN:\n");
+	//printf("No\tName\t\tIP\n");
+	//for(int i=0;i<hostsNum;i++)
+	//{
+	//	printf("%d\t%s\t\t%s\n",i+1,hosts[i].name,hosts[i].ip);
+	//}
 
 }
 
@@ -102,15 +103,16 @@ bool tcpConnect(char *ip,int port){
 	int res = connect(sn,(struct sockaddr *)&address,sizeof(address));
 	if(res!=0)
 	{
-		if(errno == EINPROGRESS){
+		if(errno == EINPROGRESS)
+        {
 			FD_ZERO(&fdr);
             FD_ZERO(&fdw);
-            FD_SET(sockfd, &fdr);
-            FD_SET(sockfd, &fdw);
+            FD_SET(sn, &fdr);
+            FD_SET(sn, &fdw);
 			//setting timeout to 1s
 			timeout.tv_sec = 1;
 			timeout.tv_usec = 0;
-            connectStatus = select(sockfd + 1, &fdr, &fdw, NULL, &timeout);
+            res = select(sn + 1, &fdr, &fdw, NULL, &timeout);
 			//when connect correctly
 			if(res==1 && FD_ISSET(sn,&fdw))
 			{
@@ -121,6 +123,7 @@ bool tcpConnect(char *ip,int port){
 			return false;
 		}
 	}
+    return false;
 }
 
 //scaning thread function
@@ -154,9 +157,9 @@ int scan(char* ip){
 			return 0;
 		}
 	}
-	sleep(1);
+	//sleep(1);
 	for(int i=0;i<DEFAULT_THREAD_NUM;i++)//stop every thread
-		pthread_join(pthread[i],NULL);
+		pthread_join(pthreads[i],NULL);
 	free(pthreads);
 	free(args);
 	return 0;
