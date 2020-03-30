@@ -58,12 +58,12 @@ void GetIp(){
 	fclose(hostname);
 	fclose(hostip);
 	//output the infomation of hosts in Lan
-	//printf("All hosts in LAN:\n");
-	//printf("No\tName\t\tIP\n");
-	//for(int i=0;i<hostsNum;i++)
-	//{
-	//	printf("%d\t%s\t\t%s\n",i+1,hosts[i].name,hosts[i].ip);
-	//}
+	printf("All hosts in LAN:\n");
+	printf("No\tName\t\tIP\n");
+	for(int i=0;i<hostsNum;i++)
+	{
+		printf("%d\t%-16s%s\n",i+1,hosts[i].name,hosts[i].ip);
+    }
 
 }
 
