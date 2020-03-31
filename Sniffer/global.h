@@ -1,6 +1,7 @@
 #ifdef _GLOBAL_H_
 #define _GLOBAL_H_
 
+#include<stdio.h>
 #include<unistd.h>
 #include<sys/socket.h>
 #include<sys/types.h>
@@ -12,6 +13,5 @@
 #include<netinet/udp.h>
 #include<netinet/ip_icmp.h>
 #include<netinet/igmp.h>
-#include<arpa/inet.h>
 
 #endif
