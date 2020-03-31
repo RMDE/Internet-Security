@@ -1,8 +1,9 @@
-#ifdef _GLOBAL_H_
+#ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 
 #include<stdio.h>
 #include<unistd.h>
+#include<netdb.h>
 #include<sys/socket.h>
 #include<sys/types.h>
 #include<sys/stat.h>
@@ -13,5 +14,6 @@
 #include<netinet/udp.h>
 #include<netinet/ip_icmp.h>
 #include<netinet/igmp.h>
+#include<arpa/inet.h>
 
 #endif
