@@ -9,7 +9,7 @@ OBJS = main.o promisc.o log.o command.o
 sniffer:$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o sniffer 
 
-main.o:main.c promisc.h log.h command.h global.h
+main.o:main.c promisc.h log.h command.h global.h tools.h
 	$(CC) $(CFLAGS) -c main.c
 
 command.o:command.c command.h log.h global.h tools.h

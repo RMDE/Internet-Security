@@ -13,7 +13,7 @@ typedef struct{
 }LogDate;  
 
 void GetDate(LogDate*);
-int OpenFile(FILE*);
+int OpenFile(char*,int);
 void LogUDP(FILE*,unsigned char*,int);
 void LogICMP(FILE*,unsigned char*,int);
 void LogTCP(FILE*,unsigned char*,int);

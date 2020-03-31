@@ -23,8 +23,6 @@ int CreateSocket()//create and return raw socket
 void ReadPacket(FILE*fp,Packets* packet,unsigned char* buf,int size)
 {
     struct iphdr* iph=(struct iphdr*)buf;
-    char* outline;
-    printf("protol:%d\n",iph->protocol);
     //switch the protocol of packet
     switch(iph->protocol)
     {
@@ -49,15 +47,6 @@ void ReadPacket(FILE*fp,Packets* packet,unsigned char* buf,int size)
             break;
     }
     ++packet->all;
-    //print
-    outline=(char*)malloc(sizeof(char)*100);
-    sprintf(outline,"[LIVE] TCP: %u  UDP: %u  ICMP: %u  IGMP: %u  Other: %u  All: %u",packet->tcp,packet->udp,packet->icmp,packet->igmp,packet->other,packet->all);
-    INITCOLOR(RED_COLOR);
-    printf("[%s]",__DATE__);//print date
-    INITCOLOR(GREEN_COLOR);
-    printf("[%s]",__TIME__);//print time
-    INITCOLOR(ZERO_COLOR);
-    printf("%s\n",outline);
 }
 
 void Clear()//clear the screen

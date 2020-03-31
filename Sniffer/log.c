@@ -17,22 +17,26 @@ void GetDate(LogDate* date)//get the current time
    date->year=timeinfo->tm_year+1900;
    date->month=timeinfo->tm_mon+1;
    date->day=timeinfo->tm_mday;
+   date->hour=timeinfo->tm_hour;
    date->minute=timeinfo->tm_min;
    date->second=timeinfo->tm_sec;
 } 
 
-int OpenFile(FILE* fp)//creating the log file and open it
+int OpenFile(char* name,int len)//creating the log file and open it
 {
     LogDate* date;
+    FILE* fp;
     date=(LogDate*)malloc(sizeof(LogDate));
     GetDate(date);
-    char name[MAX_LEN]; //file name according to date
-    snprintf(name,sizeof(name),"%02d-%02d-%02d.log",date->year,date->month,date->day);
-    fp=fopen(name,"a");
+    snprintf(name,len,"%02d-%02d-%02d.log",date->year,date->month,date->day);
+    fp=fopen(name,"w");
     if(fp==NULL)
         return -1;
     else 
+    {
+        fclose(fp);
         return 1;
+    }
 }
 
 void Output(FILE* fp,char* data,...)//writing the  header information  into logfile
@@ -96,7 +100,6 @@ void LogIP(FILE* fp,unsigned char* buf)//catch ip head and log it
     sour.sin_addr.s_addr=iph->saddr;
     memset(&des,0,sizeof(des));
     des.sin_addr.s_addr=iph->daddr;
-
     //log ip head
     Output(fp,"[IP] Getting IP Header");
     Output(fp,"     Version               : %u",(unsigned int)iph->version);
