@@ -1,6 +1,6 @@
 #ifndef _SYN_H_
 #define _SYN_H_
-
+//refer to:https://github.com/venkat-abhi/Half-open-port-scanner.git 
 #include<stdbool.h>
 #include<stdlib.h>
 #include<inttypes.h>

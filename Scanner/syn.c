@@ -1,3 +1,4 @@
+//refer to :https://github.com/venkat-abhi/Half-open-port-scanner.git
 #include<stdio.h>
 #include "syn.h"
 
