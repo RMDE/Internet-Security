@@ -109,8 +109,8 @@ bool tcpConnect(char *ip,int port){
             FD_ZERO(&fdw);
             FD_SET(sn, &fdr);
             FD_SET(sn, &fdw);
-			//setting timeout to 1s
-			timeout.tv_sec = 1;
+			//setting timeout to 0.5s
+			timeout.tv_sec = 0.5;
 			timeout.tv_usec = 0;
             res = select(sn + 1, &fdr, &fdw, NULL, &timeout);
 			//when connect correctly

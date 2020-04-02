@@ -9,22 +9,23 @@
 #include<sys/ioctl.h>
 #include<sys/socket.h>
 #include<sys/time.h>
-#include<types.h>
 #include<arpa/inet.h>
-#include <ifaddrs.h>
-#include <linux/if_ether.h>
-#include <netdb.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <errno.h>
-#include <pthread.h>
-#include <time.h>
-#include <unistd.h>
+#include<ifaddrs.h>
+#include<linux/if_ether.h>
+#include<netdb.h>
+#include<netinet/ip.h>
+#include<netinet/tcp.h>
+#include<errno.h>
+#include<pthread.h>
+#include<time.h>
+#include<unistd.h>
+#include "connection.h"
 
 #define COMMS_PORT "1024"
-#define MAX_PACK_LEN 8192
-#define IP_PACK_MAX_LEN 65536
+#define MAX_PCKT_LEN 8192
+#define IP_PCKT_MAX_LEN 65536
 #define PORT_RANGE 1024
+#define MAX_LAN_NUM 255
 
 struct my_iph 
 {
@@ -179,5 +180,16 @@ typedef struct{
 	char ip[40];
 }Host;
 
-void syn() 
+struct psuedo_header psh;
+char *dest_host_name;
+int g_sockfd;
+int g_port_counter = 0;
+int discovered_ports[PORT_RANGE] = {0};
+bool INTERFACE_PRINTED = false;
+bool TARGET_RESOLVED =  false;
+pthread_t g_listener_thread;
+pthread_t g_scanner_thread;
+Host host[MAX_LAN_NUM];
+int hostsum=0;
+
 #endif

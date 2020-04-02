@@ -2,17 +2,22 @@
 #include<stdio.h>
 #include "syn.h"
 
-struct psuedo_header psh;
-char *dest_host_name;
-int g_sockfd;
-int g_port_counter = 0;
-int discovered_ports[PORT_RANGE] = {0};
-bool INTERFACE_PRINTED = false;
-bool TARGET_RESOLVED =	false;
-pthread_t g_listener_thread;
-pthread_t g_scanner_thread;
-Host hosts[MAX_LAN_NUM];
-int hostsNum = 0;
+uint16_t csum(const void*,const int);
+uint16_t tcp_chksum(struct my_iph*,struct my_tcph*);
+void perror_exit(const char*);
+void scan_tcp_ports(char*);
+void* scanner(__attribute__((unused))void *);
+void close_connection(uint16_t,struct sockaddr_storage);
+void* listener(__attribute__((unused))void*);
+void set_interface_ip(const char*,struct my_iph*);
+void set_dest_ip(struct my_iph*);
+void set_ip_hdr(struct my_iph*);
+void set_tcp_hdr(struct my_tcph*);
+void set_raw_socket();
+void set_socket_options();
+void create_thread(enum threadType);
+void GetIP();
+void syn();
 
 uint16_t csum(const void *data, const int length)
 {
@@ -260,9 +265,6 @@ void set_interface_ip(const char *interface_name, struct my_iph *snd_iph)
 			}
 			
 			if (INTERFACE_PRINTED == false) {
-				printf("\tInterface : <%s>\n",ifa->ifa_name );
-				printf("\t  Address : <%s>\n", host);
-
 				INTERFACE_PRINTED = true;
 			}
 
@@ -290,10 +292,8 @@ void set_dest_ip(struct my_iph *snd_iph)
 		exit(EXIT_FAILURE);
 	}
 
-	printf("[*] Destination's IP address for %s:\n\t", dest_host_name);
     
 	/* Loop through the results and use the first (dest addr) we can */
-	char ip_str[INET_ADDRSTRLEN];
 	for(p = dest_info; p != NULL; p = p->ai_next) {
 		/* Get the pointer to the address itself */
 		if (p->ai_family == AF_INET) { 
@@ -301,13 +301,6 @@ void set_dest_ip(struct my_iph *snd_iph)
 			
 			/* Set the destination IP address */
 			snd_iph->dst_addr = ipv4->sin_addr.s_addr;
-			
-			/* Convert the IP to a string and print it */
-			if (inet_ntop(AF_INET, &(ipv4->sin_addr), ip_str, INET_ADDRSTRLEN) != NULL) {
-				printf("  IPv4: %s\n", ip_str);
-			} else {
-				perror_exit("[#] Passed address is not in presentation format.");
-			}
 			
 			break;
 		}
@@ -427,37 +420,38 @@ void create_thread(enum threadType type)
 	}
 }
 
-void GetIp(){
-	FILE *hostname,*hostip;
-	char name[40],ip[40];
-	//store the every host's name and ip in the same lan into file
-	system("sudo arp -a | cut -d \" \" -f 1 > .hname");
-	system("sudo arp -a | cut -d \" \" -f 2 | sed \"s/\(//g\" | sed \"s/)//g\" > .hip");
-	//get host's name and ip
-	hostname = fopen("./.hname","r");
-	hostip = fopen("./.hip","r");
-	while(fgets(name,40,hostname)&&fgets(ip,40,hostip))
-	{
-		if(name[strlen(name)-1] == '\n')
-			name[strlen(name)-1] = '\0';
-		if(ip[strlen(ip)-1] == '\n')
-			ip[strlen(ip)-1] = '\0';
-		//store the infomation into struct Host
-		strcpy(hosts[hostsNum].name,name);
-		strcpy(hosts[hostsNum].ip,ip);
-		hostsNum++;
-	}
-	fclose(hostname);
-	fclose(hostip);
+
+void GetIP(){
+    FILE *hostname,*hostip;
+    char name[40],ip[40];
+    //store the every host's name and ip in the same lan into file
+    system("sudo arp -a | cut -d \" \" -f 1 > .hname");
+    system("sudo arp -a | cut -d \" \" -f 2 | sed \"s/\(//g\" | sed \"s/)//g\" > .hip");
+    //get host's name and ip
+    hostname = fopen("./.hname","r");
+    hostip = fopen("./.hip","r");
+    while(fgets(name,40,hostname)&&fgets(ip,40,hostip))
+    {
+        if(name[strlen(name)-1] == '\n')
+            name[strlen(name)-1] = '\0';
+        if(ip[strlen(ip)-1] == '\n')
+            ip[strlen(ip)-1] = '\0';
+        //store the infomation into struct Host
+        strcpy(host[hostsum].name,name);
+        strcpy(host[hostsum].ip,ip);
+        hostsum++;
+    }
+    fclose(hostname);
+    fclose(hostip);
 }
 
 void syn()
 {
-    strcpy(hosts[hostsNum].name,"localhost");
-	strcpy(hosts[hostsNum++].ip,"127.0.0.1");
-	GetIp();
-	for(int i=0;i<hostsNum;i++)
+    strcpy(host[hostsum].name,"localhost");
+	strcpy(host[hostsum++].ip,"127.0.0.1");
+	GetIP();
+	for(int i=0;i<hostsum;i++)
 	{
-		scan_tcp_ports(hosts[i].ip);
+		scan_tcp_ports(host[i].ip);
 	}
 }
