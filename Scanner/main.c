@@ -1,19 +1,18 @@
 #include<stdlib.h>
-#include<time.h>
+#include<sys/time.h>
 #include<stdio.h>
 #include "connection.h"
 #include "global.h"
 int main()
 {
-	char ip[]="192.168.78.";
-	clock_t start,finish;
-	double duration;
+    struct timeval start,end;
 	printf("*****************The first method: TCP-connect********************\n");
-	start=clock();
-	connection(ip);
-	finish=clock();
-	duration=(double)(finish-start)/CLOCKS_PER_SEC;
-	printf("***************** End of function: %f seconds****************\n",duration);
+    gettimeofday(&start,NULL);
+	connection();
+    gettimeofday(&end,NULL);
+    double total_time=(end.tv_sec-start.tv_sec)*1000000+(end.tv_usec-start.tv_usec);
+    total_time/=1000000;
+	printf("***************** End of function: %.2f seconds****************\n",total_time);
 
 
 	return 0;
