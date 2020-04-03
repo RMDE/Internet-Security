@@ -19,6 +19,7 @@ void create_thread(enum threadType);
 void GetIP();
 void syn();
 
+//calculate the checksum
 uint16_t csum(const void *data, const int length)
 {
 	/*  Checksum Algorithm (http://www.microhowto.info/howto/calculate_an_internet_protocol_checksum_in_c.html)
@@ -55,7 +56,6 @@ uint16_t csum(const void *data, const int length)
 	/* Return the one's complement of the checksum in network byte order */
 	return htons(~sum);
 }
-
 
 uint16_t tcp_chksum(struct my_iph *snd_iph, struct my_tcph *snd_tcph)
 {

@@ -21,7 +21,7 @@
 #include<unistd.h>
 #include "connection.h"
 
-#define COMMS_PORT "1024"
+#define COMMS_PORT "9897"
 #define MAX_PCKT_LEN 8192
 #define IP_PCKT_MAX_LEN 65536
 #define PORT_RANGE 1024
