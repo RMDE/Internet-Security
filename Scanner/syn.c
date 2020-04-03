@@ -15,7 +15,7 @@ void set_ip_hdr(struct my_iph*);
 void set_tcp_hdr(struct my_tcph*);
 void set_raw_socket();
 void set_socket_options();
-void create_thread(enum threadType);
+void create_thread(enum threadType,pthread_t*);
 void GetIP();
 void syn();
 
@@ -85,13 +85,13 @@ void perror_exit(const char *s)
 
 void scan_tcp_ports(char* ip)
 {
-	dest_host_name = ip;
+	pthread_t g_listener_thread,g_scanner_thread;
+    dest_host_name = ip;
 	set_raw_socket();
 	set_socket_options();
 
-	create_thread(LISTENER_THREAD);
-	create_thread(SCANNER_THREAD);
-
+	create_thread(LISTENER_THREAD,&g_listener_thread);
+	create_thread(SCANNER_THREAD,&g_scanner_thread);
 	pthread_join(g_listener_thread, NULL);
 	pthread_join(g_scanner_thread, NULL);
 }
@@ -117,7 +117,7 @@ void* scanner(__attribute__((unused)) void *unused)
 	p_dest_addr.sin_port = htons(atoi(COMMS_PORT)); 
 	p_dest_addr.sin_addr.s_addr = snd_iph->dst_addr;
 
-	printf("Now Scan %s\n",inet_ntoa(p_dest_addr.sin_addr));
+    printf("Now Scan %s\n",inet_ntoa(p_dest_addr.sin_addr));
 
 	for (int i = 1; i < 1024; ++i) {
 		snd_tcph->dst_port = htons(i);
@@ -133,7 +133,7 @@ void* scanner(__attribute__((unused)) void *unused)
 		snd_tcph->chksum = 0;
 
 		/* Sleep before sending again */
-		usleep(100000);
+		usleep(100);
 	}
 
 	return NULL;
@@ -176,6 +176,7 @@ void close_connection(uint16_t port, struct sockaddr_storage from_addr)
 
 void* listener(__attribute__((unused)) void *unused)
 {
+    int count=0;
 	for (;;) {
 		/* Packet received as reply from target */
 		char response_packet[IP_PCKT_MAX_LEN];
@@ -203,6 +204,7 @@ void* listener(__attribute__((unused)) void *unused)
 		if (recv_tcph->dst_port != ntohs(atoi(COMMS_PORT))) {
 			continue;
 		}
+        count++;
 
 		/* Check if we the port is closed (denoted by a rst flag) */
 		if (recv_tcph->rst == 0x01) {
@@ -215,7 +217,7 @@ void* listener(__attribute__((unused)) void *unused)
 		}
 
 		/* Check to see if we recived an ACK for a port */
-		if (recv_tcph->ack == 0x01) {
+		if (recv_tcph->ack == 0x01 && recv_tcph->syn == 0x01) {
 			//printf("\nChecking port %d\n", ntohs(recv_tcph->src_port));
 			/* Check if ack is retransmitted due to delayed fin */
 			if (discovered_ports[ntohs(recv_tcph->src_port) == 1]) {
@@ -227,8 +229,11 @@ void* listener(__attribute__((unused)) void *unused)
 			discovered_ports[ntohs(recv_tcph->src_port)] = 1;
 			close_connection(ntohs(recv_tcph->src_port), from_addr);
 		}
+        if(count>=COUNT)
+        {
+            break;
+        }
 	}
-
 	return NULL;
 }
 
@@ -367,9 +372,7 @@ void set_raw_socket(void)
 	g_sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
 	if (g_sockfd == -1) {
 		perror_exit("[#] Unable to create socket\n");
-	} else {
-		printf("[*] Socket created successfully\n");
-	}
+	} 
 }
 
 void set_socket_options(void)
@@ -377,18 +380,14 @@ void set_socket_options(void)
 	/* Tell the system that we are providing the IP header */
 	if (setsockopt(g_sockfd, IPPROTO_IP, IP_HDRINCL, &(int){1}, sizeof(int)) < 0) {
 		perror_exit("[#] Unable to set socket option\n");
-	} else {
-		printf("[*] Succesfully set IP_HDRINCL option\n");
-	}
+	} 
 
 	if (setsockopt(g_sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0){
 		perror_exit("[#] setsockopt(SO_REUSEADDR) failed");
-	} else {
-		printf("[*] setsockopt(SO_REUSEADDR) successful.\n");
-	}
+	} 
 }
 
-void create_thread(enum threadType type)
+void create_thread(enum threadType type,pthread_t* i)
 {
 	int ret_v = -1;
 
@@ -396,17 +395,11 @@ void create_thread(enum threadType type)
 	switch (type)
 	{
 	case LISTENER_THREAD:
-		ret_v = pthread_create(&g_listener_thread, NULL, listener, NULL);
-		if (ret_v == 0) {
-			printf("[*] Listener thread created successfully\n");
-		}
+		ret_v = pthread_create(i, NULL, listener, NULL);
 		break;
 
 	case SCANNER_THREAD:
-		ret_v = pthread_create(&g_scanner_thread, NULL, scanner, NULL);
-		if (ret_v == 0) {
-			printf("[*] Scanner thread created successfully\n");
-		}
+		ret_v = pthread_create(i, NULL, scanner, NULL);
 		break;
 
 	default:
@@ -450,8 +443,17 @@ void syn()
     strcpy(host[hostsum].name,"localhost");
 	strcpy(host[hostsum++].ip,"127.0.0.1");
 	GetIP();
-	for(int i=0;i<hostsum;i++)
-	{
-		scan_tcp_ports(host[i].ip);
-	}
+//	for(int i=0;i<hostsum;i++)
+//	{
+       //printf("Now scan: %s\n",host[1].ip);
+		scan_tcp_ports(host[1].ip);
+	    //pthread_join(g_listener_thread, NULL);
+	    //pthread_join(g_scanner_thread, NULL);
+        printf("end\n");
+        //printf("Now scan: %s\n",host[2].ip);
+		scan_tcp_ports(host[2].ip);
+	    //pthread_join(g_listener_thread, NULL);
+	    //pthread_join(g_scanner_thread, NULL);
+        //sleep(10);
+//	}
 }

@@ -19,13 +19,13 @@
 #include<pthread.h>
 #include<time.h>
 #include<unistd.h>
-#include "connection.h"
 
 #define COMMS_PORT "9897"
 #define MAX_PCKT_LEN 8192
 #define IP_PCKT_MAX_LEN 65536
 #define PORT_RANGE 1024
 #define MAX_LAN_NUM 255
+#define COUNT 5
 
 struct my_iph 
 {
@@ -187,8 +187,8 @@ int g_port_counter = 0;
 int discovered_ports[PORT_RANGE] = {0};
 bool INTERFACE_PRINTED = false;
 bool TARGET_RESOLVED =  false;
-pthread_t g_listener_thread;
-pthread_t g_scanner_thread;
+//pthread_t g_listener_thread[10];
+//pthread_t g_scanner_thread[10];
 Host host[MAX_LAN_NUM];
 int hostsum=0;
 

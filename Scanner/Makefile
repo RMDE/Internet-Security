@@ -15,7 +15,7 @@ main.o:main.c connection.h global.h tcpsyn.h
 
 connection.o:connection.c connection.h
 	$(CC) $(CFLAGS) -c connection.c -pthread
-syn.o:syn.c syn.h connection.h tcpsyn.h
+syn.o:syn.c syn.h  tcpsyn.h
 	$(CC) $(CFLAGS) -c syn.c -pthread
 
 clean:
