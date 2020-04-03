@@ -4,7 +4,7 @@
 
 CC = gcc
 CFLAGS = -Wall -g
-OBJS = main.o connection.o syn.o
+OBJS = main.o connection.o syn.o tcpsyn.o
 
 scanner:$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o scanner -pthread
@@ -15,7 +15,11 @@ main.o:main.c connection.h global.h tcpsyn.h
 
 connection.o:connection.c connection.h
 	$(CC) $(CFLAGS) -c connection.c -pthread
-syn.o:syn.c syn.h  tcpsyn.h
+
+tcpsyn.o:tcpsyn.c tcpsyn.h
+	$(CC) $(CFLAGS) -c tcpsyn.c
+
+syn.o:syn.c syn.h  
 	$(CC) $(CFLAGS) -c syn.c -pthread
 
 clean:

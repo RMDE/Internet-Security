@@ -84,15 +84,19 @@ void perror_exit(const char *s)
 
 void scan_tcp_ports(char* ip)
 {
-	pthread_t g_listener_thread,g_scanner_thread;
+	pthread_t* g_listener_thread,*g_scanner_thread;
+    g_listener_thread=(pthread_t*)malloc(sizeof(pthread_t));
+    g_scanner_thread=(pthread_t*)malloc(sizeof(pthread_t));
     dest_host_name = ip;
 	set_raw_socket();
 	set_socket_options();
 
-	create_thread(LISTENER_THREAD,&g_listener_thread);
-	create_thread(SCANNER_THREAD,&g_scanner_thread);
-	pthread_join(g_listener_thread, NULL);
-	pthread_join(g_scanner_thread, NULL);
+	create_thread(LISTENER_THREAD,g_listener_thread);
+	create_thread(SCANNER_THREAD,g_scanner_thread);
+	pthread_join(*g_listener_thread, NULL);
+	pthread_join(*g_scanner_thread, NULL);
+    free(g_listener_thread);
+    free(g_scanner_thread);
 }
 
 void* scanner(__attribute__((unused)) void *unused)

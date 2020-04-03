@@ -7,8 +7,6 @@ typedef struct{
 	char ip[40];
 }Host;
 
-Host host[MAX_LAN_NUM];
-int hostsum=0;
 
 void syn();
 

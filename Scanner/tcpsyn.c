@@ -1,3 +1,12 @@
+#include<stdio.h>
+#include "tcpsyn.h"
+#include<stdlib.h>
+#include<string.h>
+
+Host host[MAX_LAN_NUM];
+int hostsum=0;
+void scan_tcp_ports(char*);
+
 void GetIP(){
     FILE *hostname,*hostip;
     char name[40],ip[40];
