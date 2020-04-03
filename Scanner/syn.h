@@ -24,7 +24,7 @@
 #define MAX_PCKT_LEN 8192
 #define IP_PCKT_MAX_LEN 65536
 #define PORT_RANGE 1024
-#define MAX_LAN_NUM 255
+
 #define COUNT 5
 
 struct my_iph 
@@ -175,10 +175,7 @@ enum threadType
 	SCANNER_THREAD,
 };
 
-typedef struct{
-	char name[40];
-	char ip[40];
-}Host;
+
 
 struct psuedo_header psh;
 char *dest_host_name;
@@ -189,7 +186,6 @@ bool INTERFACE_PRINTED = false;
 bool TARGET_RESOLVED =  false;
 //pthread_t g_listener_thread[10];
 //pthread_t g_scanner_thread[10];
-Host host[MAX_LAN_NUM];
-int hostsum=0;
+
 
 #endif
